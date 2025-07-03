@@ -4,8 +4,33 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  decrypt:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Print test message
-        run: echo "Workflow triggered!"
+      - name: Set up environment
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y megatools p7zip-full python3 python3-pip android-sdk-libsparse-utils
+
+      - name: Download OFP from Mega
+        run: |
+          megadl "https://mega.nz/file/boB2XarS#4oD_JkOI7TPVSmCaerxxxoTcbThQWHj9zEjCZIHJW88" --path firmware.ofp
+
+      - name: Clone repo and prepare
+        uses: actions/checkout@v3
+
+      - name: Decrypt OFP firmware
+        run: |
+          mkdir extracted
+          python3 ofp_extractor.py firmware.ofp extracted
+
+      - name: Compress Decrypted Files
+        run: |
+          7z a decrypted.zip ./extracted/*
+
+      - name: Upload Decrypted ZIP
+        uses: actions/upload-artifact@v3
+        with:
+          name: decrypted
+          path: decrypted.zip
