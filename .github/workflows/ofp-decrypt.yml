@@ -1,11 +1,21 @@
-name: Test Trigger
+name: Step 1 - Mega Download Test
 
 on:
   workflow_dispatch:
 
 jobs:
-  test:
+  test-download:
     runs-on: ubuntu-latest
     steps:
-      - name: Confirm it's working
-        run: echo "✅ Actions is alive"
+      - name: Install megatools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y megatools
+
+      - name: Download OFP file from Mega
+        run: |
+          megadl "https://mega.nz/file/boB2XarS#4oD_JkOI7TPVSmCaerxxxoTcbThQWHj9zEjCZIHJW88" --path firmware.ofp
+
+      - name: Confirm file exists
+        run: |
+          ls -lh firmware.ofp
