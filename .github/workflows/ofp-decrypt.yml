@@ -1,21 +1,45 @@
-name: Step 1 - Mega Download Test
+name: Decrypt OFP
 
 on:
   workflow_dispatch:
+    inputs:
+      filelink:
+        description: "Direct Mega link to the .ofp file"
+        required: true
+        default: ""
+      filename:
+        description: "Name to save the downloaded file as"
+        required: true
+        default: "firmware.ofp"
 
 jobs:
-  test-download:
+  decrypt:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Install megatools
+      - name: Install tools
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y megatools
+          sudo apt-get install -y megatools p7zip-full python3 python3-pip android-sdk-libsparse-utils
 
-      - name: Download OFP file from Mega
+      - name: Download .ofp from Mega
         run: |
-          megadl "https://mega.nz/file/boB2XarS#4oD_JkOI7TPVSmCaerxxxoTcbThQWHj9zEjCZIHJW88" --path firmware.ofp
+          megadl "${{ github.event.inputs.filelink }}" --path "${{ github.event.inputs.filename }}"
 
-      - name: Confirm file exists
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Decrypt OFP
         run: |
-          ls -lh firmware.ofp
+          mkdir extracted
+          python3 ofp_extractor.py "${{ github.event.inputs.filename }}" extracted
+
+      - name: Compress decrypted files
+        run: |
+          7z a decrypted.zip ./extracted/*
+
+      - name: Upload result
+        uses: actions/upload-artifact@v3
+        with:
+          name: decrypted
+          path: decrypted.zip
