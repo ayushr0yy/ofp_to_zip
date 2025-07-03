@@ -17,19 +17,19 @@ jobs:
         run: |
           megadl "https://mega.nz/file/boB2XarS#4oD_JkOI7TPVSmCaerxxxoTcbThQWHj9zEjCZIHJW88" --path firmware.ofp
 
-      - name: Clone repo and prepare
+      - name: Checkout your repo
         uses: actions/checkout@v3
 
-      - name: Decrypt OFP firmware
+      - name: Decrypt OFP
         run: |
           mkdir extracted
           python3 ofp_extractor.py firmware.ofp extracted
 
-      - name: Compress Decrypted Files
+      - name: Compress decrypted files
         run: |
           7z a decrypted.zip ./extracted/*
 
-      - name: Upload Decrypted ZIP
+      - name: Upload result
         uses: actions/upload-artifact@v3
         with:
           name: decrypted
