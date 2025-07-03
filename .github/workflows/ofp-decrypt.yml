@@ -1,36 +1,11 @@
-name: Decrypt OFP
+name: Test Trigger
 
 on:
   workflow_dispatch:
 
 jobs:
-  decrypt:
+  test:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Set up environment
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y megatools p7zip-full python3 python3-pip android-sdk-libsparse-utils
-
-      - name: Download OFP from Mega
-        run: |
-          megadl "https://mega.nz/file/boB2XarS#4oD_JkOI7TPVSmCaerxxxoTcbThQWHj9zEjCZIHJW88" --path firmware.ofp
-
-      - name: Checkout your repo
-        uses: actions/checkout@v3
-
-      - name: Decrypt OFP
-        run: |
-          mkdir extracted
-          python3 ofp_extractor.py firmware.ofp extracted
-
-      - name: Compress decrypted files
-        run: |
-          7z a decrypted.zip ./extracted/*
-
-      - name: Upload result
-        uses: actions/upload-artifact@v3
-        with:
-          name: decrypted
-          path: decrypted.zip
+      - name: Confirm it's working
+        run: echo "✅ Actions is alive"
